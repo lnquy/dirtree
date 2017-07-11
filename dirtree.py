@@ -9,26 +9,9 @@
 import os
 from os import listdir, path
 
-RED = '\033[0;31m'
 BLUE = '\033[0;34m'
-GREEN = '\033[0;32m'
-CYAN = '\033[0;36m'
 NC = '\033[0m'
-BOLD = '\033[1m'
-UNDERLINE = '\033[4m'
 SIZE = ("B", "kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
-
-
-def green(s):
-    print(GREEN + s + NC)
-
-
-def red(s):
-    print(RED + s + NC)
-
-
-def blue(s):
-    print(BLUE + s + NC)
 
 
 def pretty_size(fpath):
@@ -51,6 +34,7 @@ def watcher(dpath, level):
                 print(("  |" * level) + "  |--" + f + " - " + pretty_size(abs_path))
     except IOError:  # Permission denied
         pass
+
 
 # Start
 print("Welcome to DirTree!")
