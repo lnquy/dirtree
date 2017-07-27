@@ -9,14 +9,20 @@
 
 import os
 import sys, getopt
+import argparse
 from os import listdir, path
 
+# command line args
+parser = argparse.ArgumentParser()
+parser.add_argument("-p", "--path", help="Path to directory", default="", type=str)
+parser.add_argument("-l", "--level", help="Level of child folders to print out", default=9000, type=int)
+
+# Global vars
 BLUE = '\033[0;34m'
 NC = '\033[0m'
-SIZE = ("B", "kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
+SIZES = ("B", "kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
 folders_num = 0
 files_num = 0
-MAX_DEEP_DIRS = 9000  # It's over 9000 :)
 
 
 def pretty_size(fpath):
@@ -25,7 +31,7 @@ def pretty_size(fpath):
     while s // 1000 > 0:
         s /= 1000
         i += 1
-    return ("%.1f" % s) + SIZE[i - 1]
+    return ("%.1f" % s) + SIZES[i - 1]
 
 
 def watcher(dpath, level, watch_level):
@@ -39,7 +45,7 @@ def watcher(dpath, level, watch_level):
                 if level < watch_level - 1:
                     watcher(abs_path, level + 1, watch_level)
                 else:
-                    print(("  |" * (level + 1)) + "  +--...")
+                    print(("  |" * (level + 1)) + "  |--[+]")
             else:
                 files_num += 1
                 print(("  |" * level) + "  |--" + f + " - " + pretty_size(abs_path))
@@ -47,31 +53,18 @@ def watcher(dpath, level, watch_level):
         pass
 
 
-def parse_watch_level(argv):
-    try:
-        opts, args = getopt.getopt(argv, "l:")
-    except getopt.GetoptError:
-        print("Failed to parse watcher level. Use default value: " + str(MAX_DEEP_DIRS))
-        return MAX_DEEP_DIRS
-    for opt, arg in opts:
-        if opt == "-l":
-            return int(arg)
-    return MAX_DEEP_DIRS
-
-
-def main(argv):
-    watch_level = parse_watch_level(argv)
-    print("Max watcher level: " + str(watch_level))
+def main():
+    args = parser.parse_args()
 
     dir_path = os.environ["PWD"]
-    # TODO
-    #if len(sys.argv) >= 2:
-    #    dir_path = sys.argv[1]
+    if args.path != "":
+        dir_path = args.path
     print(dir_path)
-    watcher(dir_path, 0, watch_level)
+
+    watcher(dir_path, 0, args.level)
     print("\n" + str(folders_num) + (" folder" if folders_num <= 1 else " folders") + ", " +
           str(files_num) + (" file" if files_num <= 1 else " files"))
 
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    main()
